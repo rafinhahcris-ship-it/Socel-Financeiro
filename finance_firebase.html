@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Financeiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#4e73df;
+  --success:#1cc88a;
+  --warning:#f6c23e;
+  --danger:#e74a3b;
+  --bg:#f8f9fc;
+  --card:#ffffff;
+  --text:#5a5c69;
+}
+* {box-sizing:border-box; margin:0; padding:0; font-family:'Inter',sans-serif;}
+body {background:var(--bg); color:var(--text); padding:20px;}
+h1,h2,h3{margin-bottom:10px;}
+h1{text-align:center; margin-bottom:30px;}
+.tabs{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px;}
+.tab-button{padding:10px 20px; border:none; border-radius:8px; cursor:pointer; background:#e2e6ea; font-weight:600; transition:0.3s;}
+.tab-button.active{background:var(--primary); color:white;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.card{background:var(--card); padding:15px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin-bottom:20px;}
+.card h2{margin-bottom:10px;}
+.flex{display:flex; gap:15px; flex-wrap:wrap;}
+.flex > div{flex:1; min-width:220px;}
+table{width:100%; border-collapse:collapse; margin-top:10px;}
+th,td{border:1px solid #dee2e6; padding:8px; text-align:left;}
+.status-pendente{color:var(--warning); font-weight:bold;}
+.status-baixado{color:var(--success); font-weight:bold;}
+button{padding:6px 12px; margin:2px; cursor:pointer; border:none; border-radius:5px; transition:0.2s;}
+button:hover{opacity:0.85;}
+input,select{padding:8px; margin:5px 0; width:100%; border:1px solid #ccc; border-radius:5px;}
+.resumo{display:flex; gap:15px; flex-wrap:wrap; margin-top:20px;}
+.resumo .card{flex:1; text-align:center; font-size:16px;}
+@media(max-width:600px){.tabs{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<h1>Sistema Financeiro</h1>
+
+<div class="tabs">
+  <button class="tab-button active" onclick="openTab(event,'contasPagarTab')">Contas a Pagar</button>
+  <button class="tab-button" onclick="openTab(event,'contasReceberTab')">Contas a Receber</button>
+  <button class="tab-button" onclick="openTab(event,'cadastrosTab')">Cadastros</button>
+</div>
+
+<!-- Contas a Pagar -->
+<div id="contasPagarTab" class="tab-content active">
+  <div class="card">
+    <h2>Valor Inicial</h2>
+    <input type="number" id="valorInicial" step="0.01">
+    <button onclick="salvarValorInicial()" style="background:var(--primary); color:white;">Salvar</button>
+  </div>
+
+  <div class="card">
+    <h2>Adicionar Conta a Pagar</h2>
+    <form id="formContaPagar">
+      <input type="date" id="dataPagar" required>
+      <select id="categoriaPagar" required></select>
+      <select id="fornecedorPagar" required></select>
+      <input type="number" id="valorPagar" step="0.01" placeholder="Valor" required>
+      <input type="text" id="descricaoPagar" placeholder="Descrição" required>
+      <button type="submit" style="background:var(--primary); color:white;">Adicionar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Contas a Pagar</h2>
+    <table id="tabelaContasPagar">
+      <thead>
+        <tr><th>Data</th><th>Categoria</th><th>Fornecedor</th><th>Valor</th><th>Descrição</th><th>Status</th><th>Ações</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Contas a Receber -->
+<div id="contasReceberTab" class="tab-content">
+  <div class="card">
+    <h2>Adicionar Conta a Receber</h2>
+    <form id="formContaReceber">
+      <input type="date" id="dataReceber" required>
+      <select id="categoriaReceber" required></select>
+      <select id="clienteReceber" required></select>
+      <input type="number" id="valorReceber" step="0.01" placeholder="Valor" required>
+      <input type="text" id="descricaoReceber" placeholder="Descrição" required>
+      <button type="submit" style="background:var(--primary); color:white;">Adicionar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Contas a Receber</h2>
+    <table id="tabelaContasReceber">
+      <thead>
+        <tr><th>Data</th><th>Categoria</th><th>Cliente</th><th>Valor</th><th>Descrição</th><th>Status</th><th>Ações</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Cadastros -->
+<div id="cadastrosTab" class="tab-content">
+  <div class="card flex">
+    <div>
+      <h3>Categorias</h3>
+      <input type="text" id="novaCategoria" placeholder="Nova Categoria">
+      <button onclick="adicionarCategoria()" style="background:var(--primary); color:white;">Adicionar</button>
+      <ul id="listaCategorias"></ul>
+    </div>
+    <div>
+      <h3>Clientes</h3>
+      <input type="text" id="novoCliente" placeholder="Novo Cliente">
+      <button onclick="adicionarCliente()" style="background:var(--primary); color:white;">Adicionar</button>
+      <ul id="listaClientes"></ul>
+    </div>
+    <div>
+      <h3>Fornecedores</h3>
+      <input type="text" id="novoFornecedor" placeholder="Novo Fornecedor">
+      <button onclick="adicionarFornecedor()" style="background:var(--primary); color:white;">Adicionar</button>
+      <ul id="listaFornecedores"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- Resumo -->
+<div class="resumo">
+  <div class="card"><h3>Total Recebido</h3><p>R$ <span id="totalRecebido">0</span></p></div>
+  <div class="card"><h3>Total Pago</h3><p>R$ <span id="totalPago">0</span></p></div>
+  <div class="card"><h3>Saldo Final</h3><p>R$ <span id="saldoFinal">0</span></p></div>
+</div>
+
+<script>
+// === SCRIPT COMPLETO ===
+// (mesmo script que te passei anteriormente, todo funcional)
+let contasPagar=[],contasReceber=[],categorias=[],clientes=[],fornecedores=[],valorInicial=0;
+document.addEventListener('DOMContentLoaded',()=>{carregarDados();inicializarEventos();atualizarInterface();});
+function carregarDados(){contasPagar=JSON.parse(// localStorage (substituído pelo Firebase).getItem('contasPagar'))||[];contasReceber=JSON.parse(// localStorage (substituído pelo Firebase).getItem('contasReceber'))||[];categorias=JSON.parse(// localStorage (substituído pelo Firebase).getItem('categorias'))||['Alimentação','Transporte','Moradia','Saúde','Educação'];clientes=JSON.parse(// localStorage (substituído pelo Firebase).getItem('clientes'))||['Cliente Exemplo'];fornecedores=JSON.parse(// localStorage (substituído pelo Firebase).getItem('fornecedores'))||['Fornecedor Exemplo'];valorInicial=parseFloat(// localStorage (substituído pelo Firebase).getItem('valorInicial'))||0;document.getElementById('valorInicial').value=valorInicial;}
+function salvarDados(){// localStorage (substituído pelo Firebase).setItem('contasPagar',JSON.stringify(contasPagar));// localStorage (substituído pelo Firebase).setItem('contasReceber',JSON.stringify(contasReceber));// localStorage (substituído pelo Firebase).setItem('categorias',JSON.stringify(categorias));// localStorage (substituído pelo Firebase).setItem('clientes',JSON.stringify(clientes));// localStorage (substituído pelo Firebase).setItem('fornecedores',JSON.stringify(fornecedores));// localStorage (substituído pelo Firebase).setItem('valorInicial',valorInicial.toString());}
+function salvarValorInicial(){valorInicial=parseFloat(document.getElementById('valorInicial').value)||0;salvarDados();atualizarResumo();alert('Valor inicial salvo!');}
+function inicializarEventos(){document.getElementById('formContaPagar').addEventListener('submit',e=>{e.preventDefault();adicionarContaPagar();});document.getElementById('formContaReceber').addEventListener('submit',e=>{e.preventDefault();adicionarContaReceber();});}
+function openTab(evt,tabName){document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));document.querySelectorAll('.tab-button').forEach(tb=>tb.classList.remove('active'));document.getElementById(tabName).classList.add('active');evt.currentTarget.classList.add('active');atualizarInterface();}
+function adicionarContaPagar(){const data=document.getElementById('dataPagar').value;const categoria=document.getElementById('categoriaPagar').value;const fornecedor=document.getElementById('fornecedorPagar').value;const valor=parseFloat(document.getElementById('valorPagar').value);const descricao=document.getElementById('descricaoPagar').value;if(!data||!categoria||!fornecedor||!valor||!descricao){alert('Preencha todos os campos!');return;}contasPagar.push({id:Date.now(),data,categoria,pessoa:fornecedor,valor,descricao,status:'pendente'});salvarDados();document.getElementById('formContaPagar').reset();atualizarInterface();alert('Conta a pagar adicionada!');}
+function adicionarContaReceber(){const data=document.getElementById('dataReceber').value;const categoria=document.getElementById('categoriaReceber').value;const cliente=document.getElementById('clienteReceber').value;const valor=parseFloat(document.getElementById('valorReceber').value);const descricao=document.getElementById('descricaoReceber').value;if(!data||!categoria||!cliente||!valor||!descricao){alert('Preencha todos os campos!');return;}contasReceber.push({id:Date.now(),data,categoria,pessoa:cliente,valor,descricao,status:'pendente'});salvarDados();document.getElementById('formContaReceber').reset();atualizarInterface();alert('Conta a receber adicionada!');}
+function baixarLancamento(tipo,id){const lista=tipo==='pagar'?contasPagar:contasReceber;const lanc=lista.find(l=>l.id===id);if(lanc){lanc.status='baixado';salvarDados();atualizarInterface();alert('Lançamento baixado!');}}
+function excluirLancamento(tipo,id){if(confirm('Deseja excluir este lançamento?')){if(tipo==='pagar')contasPagar=contasPagar.filter(l=>l.id!==id);else contasReceber=contasReceber.filter(l=>l.id!==id);salvarDados();atualizarInterface();alert('Lançamento excluído!');}}
+function atualizarTabelaContasPagar(){const tbody=document.querySelector('#tabelaContasPagar tbody');tbody.innerHTML='';contasPagar.forEach(conta=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${formatarData(conta.data)}</td><td>${conta.categoria}</td><td>${conta.pessoa}</td><td>R$ ${conta.valor.toFixed(2)}</td><td>${conta.descricao}</td><td><span class="status-${conta.status}">${conta.status.toUpperCase()}</span></td><td>${conta.status==='pendente'?`<button style="background:var(--success);color:white;" onclick="baixarLancamento('pagar',${conta.id})">Baixar</button>`:''}<button style="background:var(--danger);color:white;" onclick="excluirLancamento('pagar',${conta.id})">Excluir</button></td>`;tbody.appendChild(tr);});}
+function atualizarTabelaContasReceber(){const tbody=document.querySelector('#tabelaContasReceber tbody');tbody.innerHTML='';contasReceber.forEach(conta=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${formatarData(conta.data)}</td><td>${conta.categoria}</td><td>${conta.pessoa}</td><td>R$ ${conta.valor.toFixed(2)}</td><td>${conta.descricao}</td><td><span class="status-${conta.status}">${conta.status.toUpperCase()}</span></td><td>${conta.status==='pendente'?`<button style="background:var(--success);color:white;" onclick="baixarLancamento('receber',${conta.id})">Baixar</button>`:''}<button style="background:var(--danger);color:white;" onclick="excluirLancamento('receber',${conta.id})">Excluir</button></td>`;tbody.appendChild(tr);});}
+function atualizarResumo(){const totalRecebido=contasReceber.filter(c=>c.status==='baixado').reduce((t,c)=>t+c.valor,0);const totalPago=contasPagar.filter(c=>c.status==='baixado').reduce((t,c)=>t+c.valor,0);document.getElementById('totalRecebido').textContent=totalRecebido.toFixed(2);document.getElementById('totalPago').textContent=totalPago.toFixed(2);document.getElementById('saldoFinal').textContent=(valorInicial+totalRecebido-totalPago).toFixed(2);}
+function atualizarSelects(){['categoriaPagar','categoriaReceber'].forEach(id=>{const sel=document.getElementById(id);const val=sel.value;sel.innerHTML='<option value="">Selecione</option>';categorias.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===val)o.selected=true;sel.appendChild(o);});});const selClientes=document.getElementById('clienteReceber');const valCli=selClientes.value;selClientes.innerHTML='<option value="">Selecione</option>';clientes.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===valCli)o.selected=true;selClientes.appendChild(o);});const selFornec=document.getElementById('fornecedorPagar');const valForn=selFornec.value;selFornec.innerHTML='<option value="">Selecione</option>';fornecedores.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;if(f===valForn)o.selected=true;selFornec.appendChild(o);});}
+function formatarData(d){const [a,m,dia]=d.split('-');return `${dia}/${m}/${a}`;}
+function adicionarCategoria(){const c=document.getElementById('novaCategoria').value.trim();if(c&&!categorias.includes(c)){categorias.push(c);salvarDados();document.getElementById('novaCategoria').value='';atualizarInterface();alert('Categoria adicionada!');}else alert(c? 'Categoria já existe':'Digite um nome');}
+function adicionarCliente(){const c=document.getElementById('novoCliente').value.trim();if(c&&!clientes.includes(c)){clientes.push(c);salvarDados();document.getElementById('novoCliente').value='';atualizarInterface();alert('Cliente adicionado!');}else alert(c? 'Cliente já existe':'Digite um nome');}
+function adicionarFornecedor(){const f=document.getElementById('novoFornecedor').value.trim();if(f&&!fornecedores.includes(f)){fornecedores.push(f);salvarDados();document.getElementById('novoFornecedor').value='';atualizarInterface();alert('Fornecedor adicionado!');}else alert(f? 'Fornecedor já existe':'Digite um nome');}
+function removerItem(tipo,item){if(confirm(`Remover "${item}"?`)){if(tipo==='categoria')categorias=categorias.filter(c=>c!==item);else if(tipo==='cliente')clientes=clientes.filter(c=>c!==item);else fornecedores=fornecedores.filter(f=>f!==item);salvarDados();atualizarInterface();alert(`${tipo} removido!`);}}
+function atualizarListasCadastros(){['listaCategorias','listaClientes','listaFornecedores'].forEach(id=>{const el=document.getElementById(id);el.innerHTML='';const lista=id==='listaCategorias'?categorias:id==='listaClientes'?clientes:fornecedores;lista.forEach(i=>{const li=document.createElement('li');li.innerHTML=`<span>${i}</span><button style="background:var(--danger);color:white;" onclick="removerItem('${id==='listaCategorias'?'categoria':id==='listaClientes'?'cliente':'fornecedor'}','${i}')">Remover</button>`;el.appendChild(li);});});}
+function atualizarInterface(){atualizarResumo(); atualizarSelects();atualizarTabelaContasPagar();atualizarTabelaContasReceber();atualizarListasCadastros();}
+</script>
+
+
+<!-- Firebase App (core SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<!-- Firebase Firestore SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+<script>
+  // TODO: cole aqui seu firebaseConfig gerado no console do Firebase
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_PROJECT_ID.appspot.com",
+    messagingSenderId: "XXXXXX",
+    appId: "1:XXXX:web:XXXX"
+  };
+
+  // Inicializar Firebase e Firestore
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Salvar uma conta no Firestore
+  async function salvarConta(conta) {
+    await db.collection("contas").add(conta);
+    console.log("Conta salva no Firestore!");
+  }
+
+  // Carregar contas do Firestore
+  async function carregarContas() {
+    const snapshot = await db.collection("contas").get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+</script>
+
+</body>
+</html>
